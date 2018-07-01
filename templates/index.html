@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <title>Speed Visualizer</title>
 	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css' rel='stylesheet' />
-	<style>
-        body { margin:0; padding:0;}
-        #map { position:absolute; top:0; bottom:0; width:100%; }
-        #search-bar {position: absolute; display: inline-block; top: 5%; right: 30%; width:40%; height: 6%; z-index: 10;}
-        #search-button {position:absolute; display:inline-block; top:5%; right: 25%; height: 6%; z-index: 10;}
-    </style>
+	<link href="{{ url_for ('static', filename='main.css') }}" rel='stylesheet' />
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
   </head>
   <body>
 
     <div id='map'></div>
+
+    <form id='form'>
+	  <input type="date" id='date' class='overlay'>
+	  <input type="submit" id='submit'class='overlay' value='Submit'>
+	</form> 
 
 	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.js'></script>
     <script type='text/javascript' src="{{ url_for('static', filename='map.js') }}"></script>

@@ -1,0 +1,31 @@
+body { 
+    margin:0; 
+    padding:0;
+}
+
+#map { 
+    position:absolute; 
+    top:0; 
+    bottom:0;
+    width:100%; 
+}
+
+.overlay {
+    position: absolute;
+    display: inline-block;
+    z-index: 10;
+}
+
+#date {
+    top: 5%; 
+    right: 10%; 
+    width:10%; 
+    height: 6%; 
+}
+
+#submit {
+    top: 5%; 
+    right: 5%; 
+    width:7%; 
+    height: 6%; 
+}	
