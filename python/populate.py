@@ -6,7 +6,7 @@ class Populator():
     Class to interface with and populate the SQLite database
     """
 
-    DB = 'db/trips.db'
+    DB = '../db/trips.db'
     def __init__(self, data):
         self.conn = sqlite3.connect(self.DB)
         self.cursor = self.conn.cursor()

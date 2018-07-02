@@ -10,7 +10,7 @@ def generateJSON():
         that stores arrays of valid JSON strings containing the JSON object
         stored in every file corresponding to that day
     """
-    DATA_DIR = './trips/'
+    DATA_DIR = '../trips/'
     trips = {}
 
     for filename in os.listdir(DATA_DIR):
