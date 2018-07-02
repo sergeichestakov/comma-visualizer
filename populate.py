@@ -13,7 +13,7 @@ class Populator():
         self.data = data
 
     def create_table(self):
-        sql = "CREATE TABLE IF NOT EXISTS trips (key TEXT, json TEXT)"
+        sql = "CREATE TABLE IF NOT EXISTS trips (date TEXT, json TEXT)"
         self.cursor.execute(sql)
 
     def add_entry(self, date, json):
@@ -22,11 +22,16 @@ class Populator():
         self.cursor.execute(sql, row)
 
     def run(self):
+        """
+        Create and populate db
+        """
         self.create_table()
 
         for date, arr in self.data.items():
             for obj in arr:
                 self.add_entry(date, obj)
+
+        self.conn.commit()
         self.conn.close()
 
 def main():

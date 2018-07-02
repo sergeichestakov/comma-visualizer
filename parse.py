@@ -5,7 +5,7 @@ def generateJSON():
     """
     Iterates through, parses, and reads every json file in trips directory
 
-    :returns:
+    returns:
         dictionary keyed by date as a string of the form YYYYMMDD
         that stores arrays of valid JSON strings containing the JSON object
         stored in every file corresponding to that day
