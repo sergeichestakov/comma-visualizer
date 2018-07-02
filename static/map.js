@@ -10,3 +10,26 @@ const map = new mapboxgl.Map({
 // Add zoom and rotation controls to the map.
 map.addControl(new mapboxgl.NavigationControl());
 
+
+const form = document.getElementById('form');
+
+form.addEventListener('submit', e => {
+    e.preventDefault();
+    const dateInput = document.getElementById('date');
+    const date = dateInput.value;
+
+    if(date){ //Send request to server
+        const [year, month, day] = date.split('-');
+        const body = year + month + day;
+		fetch('/process', {
+            method: 'POST',
+            body: JSON.stringify({date: body}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => console.log(res));
+    }
+
+    dateInput.value = ''; // Reset
+
+}, false);
