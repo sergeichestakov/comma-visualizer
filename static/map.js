@@ -47,6 +47,7 @@ form.addEventListener('submit', e => {
 /* Parse json response and animate map */
 
 let activeRoutes = [];
+let intervals = [];
 
 const drawRoute = (coordinates, tripNum) => {
     addFeature()
@@ -84,6 +85,7 @@ const drawRoute = (coordinates, tripNum) => {
 			clearInterval(timer)
 		}
 	}, 5)
+    intervals.push(timer)
 
 }
 
@@ -105,10 +107,16 @@ const resetRoutes = () => {
     activeRoutes.forEach(route => {
         map.removeLayer(route);
         map.removeSource(route);
-    })
+    });
 
-    geojson.features = [] //Clear previously drawn lines
+    // clear intervals to prevent continued drawing
+    intervals.forEach(interval => {
+        clearInterval(interval);
+    });
+
+    geojson.features = []; //Clear previously drawn lines and intervals
     activeRoutes = [];
+    intervals = [];
 }
 const processData = data => {
     const trips = data.trips;
