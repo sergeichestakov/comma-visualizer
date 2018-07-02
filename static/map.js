@@ -10,7 +10,6 @@ const map = new mapboxgl.Map({
 // Add zoom and rotation controls to the map.
 map.addControl(new mapboxgl.NavigationControl());
 
-
 const form = document.getElementById('form');
 
 form.addEventListener('submit', e => {
