@@ -10,6 +10,7 @@ const map = new mapboxgl.Map({
 // Add zoom and rotation controls to the map.
 map.addControl(new mapboxgl.NavigationControl());
 
+/* Event listener for form submission that sends post request of inputted date for processing in Flask server */
 const form = document.getElementById('form');
 
 form.addEventListener('submit', e => {
@@ -26,9 +27,27 @@ form.addEventListener('submit', e => {
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(res => console.log(res));
+        }).then(res => {
+            if(res.ok){
+                res.json().then(data => processData(data))
+            }
+        });
     }
 
-    dateInput.value = ''; // Reset
+    dateInput.value = ''; // Reset input field
 
 }, false);
+
+/* Helper functions to process json response and animate map */
+
+const processData = data => {
+    const trips = data.trips;
+    trips.forEach(array => {
+        const trip = JSON.parse(array[1]); //Returned as a list of [key, value], we only need value
+
+        const start = trip.start_time;
+        const end = trip.end_time;
+        const coords = trip.coords;
+
+    });
+}
