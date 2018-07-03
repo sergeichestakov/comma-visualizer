@@ -147,7 +147,8 @@ const processData = data => {
 
         //Center viewport
         const first = coordsArray[0];
-		map.jumpTo({'center': [first.lng, first.lat], 'zoom': 12})
+        const zoom = trips.length == 1 ? 12 : 9;
+		map.jumpTo({'center': [first.lng, first.lat], 'zoom': zoom})
 
         coordsArray.forEach(coord => {
             const lat = coord.lat;
