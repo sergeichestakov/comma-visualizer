@@ -58,7 +58,7 @@ const updateLayer = () => {
         map.removeSource(SOURCE)
     }
 
-    /* Reset source and layer */
+    /* Add new source and layer */
     map.addSource(SOURCE, { type: 'geojson', data: geojson });
     map.addLayer({
 		"id": SOURCE,
@@ -80,8 +80,6 @@ const addPoint = (lng, lat) => {
             "coordinates": [lng, lat]
         }
     });
-
-    map.getSource(SOURCE).setData(geojson)
 }
 
 const processData = data => {
@@ -97,7 +95,6 @@ const processData = data => {
         const end = trip.end_time;
         const coordsArray = trip.coords;
 
-        let coords = []
         coordsArray.forEach(coord => {
             const lat = coord.lat;
             const lng = coord.lng;
@@ -106,5 +103,7 @@ const processData = data => {
 
             addPoint(lng, lat)
         })
+        // Draw all the points in that trip
+        map.getSource(SOURCE).setData(geojson)
     });
 }
