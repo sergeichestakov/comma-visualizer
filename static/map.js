@@ -2,7 +2,7 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoic2VyZ2VpY2hlc3Rha292IiwiYSI6ImNqNGs2NzdxMzBnM
 
 const map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'mapbox://styles/mapbox/streets-v9',
+    style: 'mapbox://styles/mapbox/dark-v9',
     center: [-122.25, 37.7], // starting position
     zoom: 8 // starting zoom
 });
@@ -65,19 +65,30 @@ const updateLayer = () => {
 		"type": "circle",
 		"source": SOURCE,
 		"paint": {
-			"circle-color": "red",
             "circle-radius": 5,
-            "circle-opacity": 0.8
+            "circle-opacity": 1,
+            "circle-color": {
+                property: "speed",
+                stops: [
+                    [0, "red"],
+                    [25, "yellow"],
+                    [40, "green"],
+                    [70, "darkgreen"],
+                ]
+            }
 		}
 	});
 }
 
-const addPoint = (lng, lat) => {
+const addPoint = (lng, lat, speed) => {
     geojson.features.push({
         "type": "Feature",
         "geometry": {
             "type": "Point",
             "coordinates": [lng, lat]
+        },
+        "properties": {
+            "speed": speed
         }
     });
 }
@@ -101,7 +112,7 @@ const processData = data => {
             const speed = coord.speed;
             const dist = coord.dist;
 
-            addPoint(lng, lat)
+            addPoint(lng, lat, speed)
         })
         // Draw all the points in that trip
         map.getSource(SOURCE).setData(geojson)
