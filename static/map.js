@@ -66,8 +66,7 @@ const updateLayer = () => {
         "interactive": true,
 		"source": SOURCE,
 		"paint": {
-            "circle-radius": 5,
-            "circle-opacity": 1,
+			'circle-radius': 7,
             "circle-color": {
                 property: "speed",
                 stops: [
@@ -104,7 +103,7 @@ map.on('click', e => {
 	.addTo(map);
 });
 
-/* Change cursor on mouseover */
+// Mouseover event handlers to change cursor
 map.on('mouseenter', SOURCE, () => map.getCanvas().style.cursor = 'pointer')
 map.on('mouseleave', SOURCE, () => map.getCanvas().style.cursor = '')
 
@@ -134,12 +133,20 @@ const processData = data => {
 
     updateLayer() // Reset the map
 
+    if(!trips.length) {
+        alert("Sorry, no data available for that day.\nPlease enter a date in the range 01/28/17 - 10/04/17");
+    }
+
     trips.forEach(responseArray => {
         const trip = JSON.parse(responseArray[1]); //Returned as a list of [key, value], we only need value
 
         const start = trip.start_time;
         const end = trip.end_time;
         const coordsArray = trip.coords;
+
+        //Center viewport
+        const first = coordsArray[0];
+		map.jumpTo({'center': [first.lng, first.lat], 'zoom': 12})
 
         coordsArray.forEach(coord => {
             const lat = coord.lat;
