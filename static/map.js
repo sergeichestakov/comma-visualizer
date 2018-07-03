@@ -10,13 +10,14 @@ const map = new mapboxgl.Map({
 // Add zoom and rotation controls to the map.
 map.addControl(new mapboxgl.NavigationControl());
 
-// Create a GeoJSON source with an empty lineString.
+// Initialize a GeoJSON source object
 let geojson = {
     "type": "FeatureCollection",
     "features": []
 }
 
 /* Event listener for form submission that sends post request of inputted date for processing in Flask server */
+
 const form = document.getElementById('form');
 
 form.addEventListener('submit', e => {
@@ -46,88 +47,51 @@ form.addEventListener('submit', e => {
 
 /* Parse json response and animate map */
 
-let activeRoutes = [];
-let intervals = [];
+const SOURCE = 'trips'
 
-const drawRoute = (coordinates, tripNum) => {
-    addFeature()
+const updateLayer = () => {
+    geojson.features = []
 
-	// start by showing just the first coordinate
-	geojson.features[tripNum - 1].geometry.coordinates = [coordinates[0]];
+    /* Remove previously rendered points */
+    if(map.getLayer(SOURCE)){
+        map.removeLayer(SOURCE)
+        map.removeSource(SOURCE)
+    }
 
-    const route = 'route' + tripNum
-    activeRoutes.push(route);
-
-    // zoom in to new route
-    map.jumpTo({ 'center': coordinates[0], 'zoom': 11 });
-
-	// add route to map
-	map.addSource(route, { type: 'geojson', data: geojson });
-	map.addLayer({
-		"id": route,
-		"type": "line",
-		"source": route,
+    /* Reset source and layer */
+    map.addSource(SOURCE, { type: 'geojson', data: geojson });
+    map.addLayer({
+		"id": SOURCE,
+		"type": "circle",
+		"source": SOURCE,
 		"paint": {
-			"line-color": "red",
-			"line-opacity": 0.75,
-			"line-width": 5
+			"circle-color": "red",
+            "circle-radius": 5,
+            "circle-opacity": 0.8
 		}
 	});
-
-    // animate route rendering
-	let index = 0
-	const timer = setInterval(() => {
-		if (index < coordinates.length) {
-			geojson.features[tripNum - 1].geometry.coordinates.push(coordinates[index]);
-			map.getSource(route).setData(geojson);
-			index++;
-		} else {
-			clearInterval(timer)
-		}
-	}, 5)
-    intervals.push(timer)
-
 }
 
-// Add a new line to geoJson object
-const addFeature = () => {
+const addPoint = (lng, lat) => {
     geojson.features.push({
         "type": "Feature",
         "geometry": {
-            "type": "LineString",
-            "coordinates": [
-                []
-            ]
+            "type": "Point",
+            "coordinates": [lng, lat]
         }
- 	});
-}
-
-const resetRoutes = () => {
-    // delete all previous route drawings and reset
-    activeRoutes.forEach(route => {
-        map.removeLayer(route);
-        map.removeSource(route);
     });
 
-    // clear intervals to prevent continued drawing
-    intervals.forEach(interval => {
-        clearInterval(interval);
-    });
-
-    geojson.features = []; //Clear previously drawn lines and intervals
-    activeRoutes = [];
-    intervals = [];
+    map.getSource(SOURCE).setData(geojson)
 }
+
 const processData = data => {
     const trips = data.trips;
-    let tripNum = 0;
     console.log(trips)
 
-    resetRoutes()
+    updateLayer() // Reset the map
 
     trips.forEach(responseArray => {
         const trip = JSON.parse(responseArray[1]); //Returned as a list of [key, value], we only need value
-        tripNum++;
 
         const start = trip.start_time;
         const end = trip.end_time;
@@ -140,8 +104,7 @@ const processData = data => {
             const speed = coord.speed;
             const dist = coord.dist;
 
-            coords.push([lng, lat]);
+            addPoint(lng, lat)
         })
-        drawRoute(coords, tripNum)
     });
 }
