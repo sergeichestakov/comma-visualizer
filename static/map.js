@@ -80,7 +80,31 @@ const updateLayer = () => {
 	});
 }
 
-const addPoint = (lng, lat, speed) => {
+// Click event handler to generate popup with information on selected point
+map.on('click', e => {
+	const features = map.queryRenderedFeatures(e.point, { layers: [SOURCE] });
+
+	// if the features have no info, return nothing
+	if (!features.length) {
+		return;
+	}
+
+	const feature = features[0];
+
+	// Populate the popup and set its coordinates
+	const popup = new mapboxgl.Popup()
+	.setLngLat(feature.geometry.coordinates)
+	.setHTML('<div id=\'popup\' class=\'popup\' style=\'z-index: 10;\'> <h2> Details: </h2>' +
+	'<ul class=\'list-group\'>' +
+	'<li class=\'list-group-item\'> Speed: ' + feature.properties['speed'].toFixed(2) + ' mph' + ' </li>' +
+    '<li class=\'list-group-item\'> Distance traveled: ' + feature.properties['dist'].toFixed(2) + ' miles' + ' </li>' +
+    '<li class=\'list-group-item\'> Start Time: ' + feature.properties['start'] + ' </li>' +
+    '<li class=\'list-group-item\'> End Time: ' + feature.properties['end'] + ' </li>' +
+	'</ul></div>')
+	.addTo(map);
+});
+
+const addPoint = (lng, lat, speed, dist, start, end) => {
     geojson.features.push({
         "type": "Feature",
         "geometry": {
@@ -88,9 +112,16 @@ const addPoint = (lng, lat, speed) => {
             "coordinates": [lng, lat]
         },
         "properties": {
-            "speed": speed
+            "speed": speed,
+            "dist": dist,
+            "start": start,
+            "end": end,
         }
     });
+}
+
+const getTime = date => {
+    return date.substr(date.indexOf('T') + 1)
 }
 
 const processData = data => {
@@ -112,7 +143,7 @@ const processData = data => {
             const speed = coord.speed;
             const dist = coord.dist;
 
-            addPoint(lng, lat, speed)
+            addPoint(lng, lat, speed, dist, getTime(start), getTime(end))
         })
         // Draw all the points in that trip
         map.getSource(SOURCE).setData(geojson)
