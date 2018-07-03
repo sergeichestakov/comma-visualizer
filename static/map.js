@@ -123,13 +123,14 @@ const addPoint = (lng, lat, speed, dist, start, end) => {
     });
 }
 
+//Helper function to extract time from date string
 const getTime = date => {
     return date.substr(date.indexOf('T') + 1)
 }
 
+// This function parses the json response from the server, extracts the necessary information, and renders each trip
 const processData = data => {
     const trips = data.trips;
-    console.log(trips)
 
     updateLayer() // Reset the map
 
