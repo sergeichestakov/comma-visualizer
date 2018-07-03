@@ -43,6 +43,23 @@ body {
     height: 50px; 
 }
 
+/* Mobile */
+@media(max-width: 768px) {
+    #submit {
+        bottom: 30px;
+        left: 55%;
+        width: 70px;
+        height: 40px;
+    }
+    #date {
+        bottom: 30px;
+        left: 23%;
+        width: 100px;
+        height: 40px;
+    }
+}
+
+/* Desktop */
 @media(min-width: 768px) {
     #submit, #date {
         top: 30px;
