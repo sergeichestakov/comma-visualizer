@@ -28,20 +28,28 @@ body {
     color:white;
     top: 25px;
     right: 375px;
+    display: none;
 }
 
 #date {
-    top: 30px; 
     right: 200px; 
     width: 150px; 
     height: 50px; 
 }
 
 #submit {
-    top: 30px; 
     right: 100px; 
     width: 90px; 
     height: 50px; 
+}
+
+@media(min-width: 768px) {
+    #submit, #date {
+        top: 30px;
+    }
+    #prompt { 
+        display: block;
+    }
 }
 
 .popup {
