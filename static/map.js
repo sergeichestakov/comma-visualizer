@@ -63,6 +63,7 @@ const updateLayer = () => {
     map.addLayer({
 		"id": SOURCE,
 		"type": "circle",
+        "interactive": true,
 		"source": SOURCE,
 		"paint": {
             "circle-radius": 5,
@@ -94,15 +95,18 @@ map.on('click', e => {
 	// Populate the popup and set its coordinates
 	const popup = new mapboxgl.Popup()
 	.setLngLat(feature.geometry.coordinates)
-	.setHTML('<div id=\'popup\' class=\'popup\' style=\'z-index: 10;\'> <h2> Details: </h2>' +
-	'<ul class=\'list-group\'>' +
-	'<li class=\'list-group-item\'> Speed: ' + feature.properties['speed'].toFixed(2) + ' mph' + ' </li>' +
-    '<li class=\'list-group-item\'> Distance traveled: ' + feature.properties['dist'].toFixed(2) + ' miles' + ' </li>' +
-    '<li class=\'list-group-item\'> Start Time: ' + feature.properties['start'] + ' </li>' +
-    '<li class=\'list-group-item\'> End Time: ' + feature.properties['end'] + ' </li>' +
-	'</ul></div>')
+	.setHTML('<div id=\'popup\' class=\'popup\'> <h3> Details </h3>' +
+	'<p> Speed: ' + feature.properties['speed'].toFixed(2) + ' mph' + ' </p>' +
+    '<p> Distance: ' + feature.properties['dist'].toFixed(2) + ' miles' + ' </p>' +
+    '<p> Start Time: ' + feature.properties['start'] + ' </p>' +
+    '<p> End Time: ' + feature.properties['end'] + ' </p>' +
+	'</div>')
 	.addTo(map);
 });
+
+/* Change cursor on mouseover */
+map.on('mouseenter', SOURCE, () => map.getCanvas().style.cursor = 'pointer')
+map.on('mouseleave', SOURCE, () => map.getCanvas().style.cursor = '')
 
 const addPoint = (lng, lat, speed, dist, start, end) => {
     geojson.features.push({
