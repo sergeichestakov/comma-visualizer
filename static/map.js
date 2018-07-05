@@ -96,12 +96,12 @@ const updateLayer = () => {
     /* Add new source and layer */
     map.addSource(SOURCE, { type: 'geojson', data: geojson });
     map.addLayer({
-		"id": SOURCE,
-		"type": "circle",
+        "id": SOURCE,
+        "type": "circle",
         "interactive": true,
-		"source": SOURCE,
-		"paint": {
-            'circle-radius': 7,
+        "source": SOURCE,
+        "paint": {
+            "circle-radius": 7,
             "circle-color": {
                 property: "speed",
                 stops: [ // Rules to render point colors: [speed, color] (anything in between is linearly interpolated)
