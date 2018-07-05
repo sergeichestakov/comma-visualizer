@@ -28,7 +28,7 @@ form.addEventListener('submit', e => {
     if(date){ //Send request to server
         const [year, month, day] = date.split('-');
         const body = year + month + day;
-		fetch('/process', {
+        fetch('/process', {
             method: 'POST',
             body: JSON.stringify({date: body}),
             headers: {
@@ -49,6 +49,41 @@ form.addEventListener('submit', e => {
 
 const SOURCE = 'trips'
 
+// This function parses the json response from the server, extracts the necessary information, and renders each trip
+const processData = data => {
+    const trips = data.trips;
+
+    updateLayer() // Reset the map
+
+    if(!trips.length) {
+        alert("Sorry, no data available for that day.\nPlease enter another date in the range 01/28/17 - 10/04/17");
+    }
+
+    trips.forEach(responseArray => {
+        const trip = JSON.parse(responseArray[1]); //Returned as a list of [key, value], we only need value
+
+        const start = trip.start_time;
+        const end = trip.end_time;
+        const coordsArray = trip.coords;
+
+        //Center viewport
+        const first = coordsArray[0];
+        const zoom = trips.length == 1 ? 12 : 9;
+        map.jumpTo({'center': [first.lng, first.lat], 'zoom': zoom})
+
+        coordsArray.forEach(coord => {
+            const lat = coord.lat;
+            const lng = coord.lng;
+            const speed = coord.speed;
+            const dist = coord.dist;
+
+            addPoint(lng, lat, speed, dist, getTime(start), getTime(end))
+        })
+        // Draw all the points in that trip
+        map.getSource(SOURCE).setData(geojson)
+    });
+}
+
 const updateLayer = () => {
     geojson.features = []
 
@@ -66,46 +101,19 @@ const updateLayer = () => {
         "interactive": true,
 		"source": SOURCE,
 		"paint": {
-			'circle-radius': 7,
+            'circle-radius': 7,
             "circle-color": {
                 property: "speed",
-                stops: [
+                stops: [ // Rules to render point colors: [speed, color] (anything in between is linearly interpolated)
                     [0, "red"],
                     [25, "yellow"],
                     [40, "green"],
                     [70, "darkgreen"],
                 ]
             }
-		}
-	});
+        }
+    });
 }
-
-// Click event handler to generate popup with information on selected point
-map.on('click', e => {
-	const features = map.queryRenderedFeatures(e.point, { layers: [SOURCE] });
-
-	// if the features have no info, return nothing
-	if (!features.length) {
-		return;
-	}
-
-	const feature = features[0];
-
-	// Populate the popup and set its coordinates
-	const popup = new mapboxgl.Popup()
-	.setLngLat(feature.geometry.coordinates)
-	.setHTML('<div id=\'popup\' class=\'popup\'> <h3> Details </h3>' +
-	'<p> Speed: ' + feature.properties['speed'].toFixed(2) + ' mph' + ' </p>' +
-    '<p> Distance: ' + feature.properties['dist'].toFixed(2) + ' miles' + ' </p>' +
-    '<p> Start Time: ' + feature.properties['start'] + ' </p>' +
-    '<p> End Time: ' + feature.properties['end'] + ' </p>' +
-	'</div>')
-	.addTo(map);
-});
-
-// Mouseover event handlers to change cursor
-map.on('mouseenter', SOURCE, () => map.getCanvas().style.cursor = 'pointer')
-map.on('mouseleave', SOURCE, () => map.getCanvas().style.cursor = '')
 
 const addPoint = (lng, lat, speed, dist, start, end) => {
     geojson.features.push({
@@ -128,37 +136,29 @@ const getTime = date => {
     return date.substr(date.indexOf('T') + 1)
 }
 
-// This function parses the json response from the server, extracts the necessary information, and renders each trip
-const processData = data => {
-    const trips = data.trips;
+// Mouseover event handlers to change cursor
+map.on('mouseenter', SOURCE, () => map.getCanvas().style.cursor = 'pointer')
+map.on('mouseleave', SOURCE, () => map.getCanvas().style.cursor = '')
 
-    updateLayer() // Reset the map
+// Click event handler to generate popup with information on selected point
+map.on('click', e => {
+    const features = map.queryRenderedFeatures(e.point, { layers: [SOURCE] });
 
-    if(!trips.length) {
-        alert("Sorry, no data available for that day.\nPlease enter a date in the range 01/28/17 - 10/04/17");
+    if (!features.length) { //not a point
+        return;
     }
 
-    trips.forEach(responseArray => {
-        const trip = JSON.parse(responseArray[1]); //Returned as a list of [key, value], we only need value
+    const feature = features[0];
 
-        const start = trip.start_time;
-        const end = trip.end_time;
-        const coordsArray = trip.coords;
+    // Populate the popup and set its coordinates
+    const popup = new mapboxgl.Popup()
+        .setLngLat(feature.geometry.coordinates)
+        .setHTML('<div id=\'popup\' class=\'popup\'> <h3> Details </h3>' +
+            '<p> Speed: ' + feature.properties['speed'].toFixed(2) + ' mph' + ' </p>' +
+            '<p> Distance: ' + feature.properties['dist'].toFixed(2) + ' miles' + ' </p>' +
+            '<p> Start Time: ' + feature.properties['start'] + ' </p>' +
+            '<p> End Time: ' + feature.properties['end'] + ' </p>' +
+        '</div>')
+        .addTo(map);
+});
 
-        //Center viewport
-        const first = coordsArray[0];
-        const zoom = trips.length == 1 ? 12 : 9;
-		map.jumpTo({'center': [first.lng, first.lat], 'zoom': zoom})
-
-        coordsArray.forEach(coord => {
-            const lat = coord.lat;
-            const lng = coord.lng;
-            const speed = coord.speed;
-            const dist = coord.dist;
-
-            addPoint(lng, lat, speed, dist, getTime(start), getTime(end))
-        })
-        // Draw all the points in that trip
-        map.getSource(SOURCE).setData(geojson)
-    });
-}
